@@ -67,8 +67,4 @@ coverage.xml
 .DS_Store
 
 # Project folders
-api/
-model/
-dash/
-data/
-logs/
+
