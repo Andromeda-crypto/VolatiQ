@@ -1,5 +1,5 @@
 import dash
-from dash import html, dcc, Input, Output, State, dash_table
+from dash import html, dcc, Input, Output, State, dash_table, ctx
 import dash_bootstrap_components as dbc
 import pandas as pd
 import plotly.graph_objs as go
@@ -7,8 +7,18 @@ import base64
 import io
 import requests
 
-# App setup with Bootstrap theme
-app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
+# Dash will automatically load any CSS in the 'assets' folder in the same directory as this file.
+# Place custom styles in dashboard/assets/custom.css
+app = dash.Dash(
+    __name__,
+    external_stylesheets=[dbc.themes.BOOTSTRAP],
+    title="VolatiQ Dashboard",
+    update_title=None,
+    suppress_callback_exceptions=True
+)
+
+# Logo placeholder (replace src with your logo if available)
+logo = html.Img(src='https://upload.wikimedia.org/wikipedia/commons/6/6b/Bitmap_Icon_Logo.png', height='48px', style={'marginRight': '16px'})
 
 # Default features
 FEATURE_OPTIONS = [
@@ -19,104 +29,222 @@ FEATURE_OPTIONS = [
     {'label': 'RSI', 'value': 'rsi'},
 ]
 
-app.layout = dbc.Container([
-    dbc.Row([
-        dbc.Col(html.H1('VolatiQ: Market Volatility Forecast'), width=12)
-    ], className='mb-2 mt-2'),
-    dbc.Row([
-        dbc.Col(html.P('Forecast short-term market volatility with advanced ML. Upload your data, select features, and visualize predictions.'), width=12)
-    ], className='mb-4'),
-    dbc.Row([
-        dbc.Col([
-            dbc.Label('Prediction Horizon (days)'),
-            dcc.Dropdown(
-                id='horizon-dropdown',
-                options=[{'label': f'{d} days', 'value': d} for d in [1, 5, 10, 21]],
-                value=5,
-                clearable=False
-            ),
-        ], md=3),
-        dbc.Col([
-            dbc.Label('Select Features'),
-            dcc.Dropdown(
-                id='feature-dropdown',
-                options=FEATURE_OPTIONS,
-                value=[f['value'] for f in FEATURE_OPTIONS],
-                multi=True
-            ),
-        ], md=5),
-        dbc.Col([
-            dbc.Label('Upload CSV Data'),
-            dcc.Upload(
-                id='upload-data',
-                children=html.Div(['Drag and Drop or ', html.A('Select Files')]),
-                style={
-                    'width': '100%', 'height': '38px', 'lineHeight': '38px',
-                    'borderWidth': '1px', 'borderStyle': 'dashed', 'borderRadius': '5px',
-                    'textAlign': 'center', 'margin-bottom': '10px'
-                },
-                multiple=False
-            ),
-        ], md=4),
-    ], className='mb-4'),
-    dbc.Row([
-        dbc.Col([
-            dbc.Button('Run Prediction', id='predict-btn', color='primary', className='me-2'),
-            dcc.Loading(id='loading', type='circle', children=html.Div(id='loading-output'))
-        ], width=2),
-    ], className='mb-4'),
-    dbc.Row([
-        dbc.Col([
-            html.Div(id='output-table'),
-            dcc.Graph(id='volatility-graph'),
-        ], width=12)
-    ]),
-], fluid=True)
+app.layout = html.Div([
+    dcc.Store(id='theme-store', data='light-mode'),
+    dcc.Store(id='table-data-store'),
+    dcc.Store(id='last-pred-features'),
+    dbc.Container([
+        dbc.Row([
+            dbc.Col([
+                html.Div([
+                    logo,
+                    html.H1('VolatiQ', style={'display': 'inline', 'fontWeight': 'bold', 'fontSize': '2.5rem', 'verticalAlign': 'middle'}),
+                    dbc.Switch(
+                        id='theme-toggle',
+                        label='Dark Mode',
+                        value=False,
+                        style={'marginLeft': 'auto', 'marginRight': '0', 'marginTop': '8px', 'marginBottom': '8px', 'fontWeight': '600', 'fontSize': '1.1rem'}
+                    ),
+                ], style={'display': 'flex', 'alignItems': 'center', 'marginBottom': '8px', 'gap': '1.5rem'}),
+                html.H5('Market Volatility Intelligence Platform', style={'color': '#6c757d', 'marginBottom': '0.5rem'}),
+            ], width=12)
+        ], className='mt-4 mb-2'),
+        dbc.Row([
+            dbc.Col(html.P('Forecast short-term market volatility with advanced ML. Upload your data, select features, and visualize predictions.', style={'fontSize': '1.1rem'}), width=12)
+        ], className='mb-3'),
+        html.Hr(style={'margin': '0.5rem 0 1.5rem 0', 'borderColor': '#e9ecef'}),
+        dbc.Row([
+            dbc.Col([
+                dbc.Card([
+                    dbc.CardBody([
+                        dbc.Row([
+                            dbc.Col([
+                                dbc.Label('Prediction Horizon (days)', id='horizon-label', style={'fontWeight': '500'}),
+                                dcc.Dropdown(
+                                    id='horizon-dropdown',
+                                    options=[{'label': f'{d} days', 'value': d} for d in [1, 5, 10, 21]],
+                                    value=5,
+                                    clearable=False,
+                                    style={'marginBottom': '8px'}
+                                ),
+                                dbc.Tooltip('How many days ahead to forecast volatility.', target='horizon-label'),
+                            ], md=3),
+                            dbc.Col([
+                                dbc.Label('Select Features', id='feature-label', style={'fontWeight': '500'}),
+                                dcc.Dropdown(
+                                    id='feature-dropdown',
+                                    options=FEATURE_OPTIONS,
+                                    value=[f['value'] for f in FEATURE_OPTIONS],
+                                    multi=True,
+                                    style={'marginBottom': '8px'}
+                                ),
+                                dbc.Tooltip('Choose which features to use for prediction.', target='feature-label'),
+                            ], md=5),
+                            dbc.Col([
+                                dbc.Label('Upload CSV Data', id='upload-label', style={'fontWeight': '500'}),
+                                dcc.Upload(
+                                    id='upload-data',
+                                    children=html.Div(['Drag and Drop or ', html.A('Select Files')]),
+                                    style={
+                                        'width': '100%', 'height': '38px', 'lineHeight': '38px',
+                                        'borderWidth': '1px', 'borderStyle': 'dashed', 'borderRadius': '5px',
+                                        'textAlign': 'center', 'margin-bottom': '10px', 'background': '#f1f3f6'
+                                    },
+                                    multiple=False
+                                ),
+                                dbc.Tooltip('Upload a CSV file with your market data.', target='upload-label'),
+                            ], md=4),
+                        ], className='mb-2'),
+                        dbc.Row([
+                            dbc.Col([
+                                dbc.Button('Run Prediction', id='predict-btn', color='primary', className='me-2', style={'fontWeight': '600', 'fontSize': '1.1rem', 'padding': '8px 24px'}),
+                                dcc.Loading(id='loading', type='circle', children=html.Div(id='loading-output'))
+                            ], width=12, className='d-flex justify-content-end')
+                        ]),
+                    ])
+                ], style={'boxShadow': '0 2px 12px rgba(0,0,0,0.06)', 'borderRadius': '16px', 'background': '#fff', 'marginBottom': '2rem'})
+            ], width=12)
+        ]),
+        dbc.Row([
+            dbc.Col([
+                html.Hr(style={'margin': '2rem 0 1rem 0', 'borderColor': '#e9ecef'}),
+                html.Div(id='output-table', style={'marginBottom': '2rem'}),
+                dcc.Graph(id='volatility-graph', config={'displayModeBar': False}, style={'borderRadius': '12px', 'boxShadow': '0 1px 8px rgba(0,0,0,0.04)', 'background': '#fff'}),
+                html.Div(id='shap-explanation', style={'marginTop': '2rem'}),
+            ], width=12)
+        ]),
+        html.Footer([
+            html.Hr(style={'margin': '2rem 0 1rem 0', 'borderColor': '#e9ecef'}),
+            html.Div('© 2024 VolatiQ. All rights reserved.', style={'color': '#adb5bd', 'fontSize': '0.95rem', 'textAlign': 'center', 'marginBottom': '1rem'})
+        ])
+    ], fluid=True)
+], id='main-div', className='light-mode', style={'minHeight': '100vh', 'transition': 'background 0.5s, color 0.5s'})
 
 @app.callback(
-    [Output('output-table', 'children'), Output('volatility-graph', 'figure'), Output('loading-output', 'children')],
+    Output('main-div', 'className'),
+    Output('theme-store', 'data'),
+    Input('theme-toggle', 'value'),
+    State('theme-store', 'data')
+)
+def toggle_theme(is_dark, current):
+    if is_dark:
+        return 'dark-mode', 'dark-mode'
+    return 'light-mode', 'light-mode'
+
+@app.callback(
+    [Output('output-table', 'children'), Output('volatility-graph', 'figure'), Output('loading-output', 'children'), Output('table-data-store', 'data'), Output('last-pred-features', 'data')],
     [Input('predict-btn', 'n_clicks')],
     [State('upload-data', 'contents'), State('horizon-dropdown', 'value'), State('feature-dropdown', 'value')]
 )
 def update_output(n_clicks, contents, horizon, features):
     if not n_clicks:
-        return '', go.Figure(), ''
+        return '', go.Figure(), '', None, None
     if contents is None:
-        return dbc.Alert('Please upload a CSV file.', color='warning'), go.Figure(), ''
-    # Parse uploaded CSV
+        return dbc.Alert('Please upload a CSV file.', color='warning'), go.Figure(), '', None, None
     content_type, content_string = contents.split(',')
     decoded = base64.b64decode(content_string)
     try:
         df = pd.read_csv(io.StringIO(decoded.decode('utf-8')))
     except Exception as e:
-        return dbc.Alert(f'Error reading CSV: {e}', color='danger'), go.Figure(), ''
-    # Check if selected features exist
+        return dbc.Alert(f'Error reading CSV: {e}', color='danger'), go.Figure(), '', None, None
     missing = [f for f in features if f not in df.columns]
     if missing:
-        return dbc.Alert(f'Missing features in uploaded data: {missing}', color='danger'), go.Figure(), ''
-    # Prepare data for API
+        return dbc.Alert(f'Missing features in uploaded data: {missing}', color='danger'), go.Figure(), '', None, None
     X = df[features].values.tolist()
     try:
         response = requests.post('http://localhost:5000/predict', json={'features': X})
         if response.status_code == 200:
             preds = response.json()['predictions']
             df['Predicted Volatility'] = preds
+            # Add Explain buttons
+            explain_buttons = [
+                dbc.Button('Explain', id={'type': 'explain-btn', 'index': i}, color='info', size='sm', style={'margin': '0 4px'})
+                for i in range(len(df))
+            ]
             table = dash_table.DataTable(
                 data=df.head(10).to_dict('records'),
-                columns=[{'name': i, 'id': i} for i in df.columns],
+                columns=[{'name': i, 'id': i} for i in df.columns] + [{'name': 'Explain', 'id': 'Explain'}],
                 page_size=10,
-                style_table={'overflowX': 'auto'},
-                style_cell={'textAlign': 'left'},
+                style_table={'overflowX': 'auto', 'borderRadius': '12px', 'boxShadow': '0 1px 8px rgba(0,0,0,0.04)'},
+                style_cell={'textAlign': 'left', 'fontFamily': 'Inter, Segoe UI, Arial, sans-serif', 'fontSize': '1.05rem', 'padding': '8px'},
+                style_header={'backgroundColor': '#f1f3f6', 'fontWeight': 'bold'},
+                row_deletable=False,
+                editable=False,
+                # Add Explain buttons to the table
+                data_previous=df.head(10).to_dict('records'),
             )
-            fig = go.Figure([
-                go.Scatter(x=df.index, y=df['Predicted Volatility'], mode='lines+markers', name='Predicted Volatility')
-            ])
-            fig.update_layout(title='Predicted Volatility', xaxis_title='Index', yaxis_title='Volatility')
-            return table, fig, ''
+            # Store table data and features for SHAP
+            return (
+                html.Div([
+                    table,
+                    html.Div([
+                        dbc.Button('Explain', id={'type': 'explain-btn', 'index': i}, color='info', size='sm', style={'margin': '0 4px'})
+                        for i in range(min(10, len(df)))
+                    ], style={'marginTop': '8px'})
+                ]),
+                go.Figure([
+                    go.Scatter(x=df.index, y=df['Predicted Volatility'], mode='lines+markers', name='Predicted Volatility', line=dict(color='#007bff'))
+                ]).update_layout(
+                    title='Predicted Volatility',
+                    xaxis_title='Index',
+                    yaxis_title='Volatility',
+                    plot_bgcolor='#fff',
+                    paper_bgcolor='#fff',
+                    font=dict(family='Inter, Segoe UI, Arial, sans-serif', size=15),
+                    margin=dict(l=40, r=40, t=60, b=40),
+                    hovermode='x unified',
+                    height=420,
+                ),
+                '',
+                df.head(10).to_dict('records'),
+                X[:10]
+            )
         else:
-            return dbc.Alert(f'API Error: {response.text}', color='danger'), go.Figure(), ''
+            return dbc.Alert(f'API Error: {response.text}', color='danger'), go.Figure(), '', None, None
     except Exception as e:
-        return dbc.Alert(f'Error contacting API: {e}', color='danger'), go.Figure(), ''
+        return dbc.Alert(f'Error contacting API: {e}', color='danger'), go.Figure(), '', None, None
+
+@app.callback(
+    Output('shap-explanation', 'children'),
+    Input({'type': 'explain-btn', 'index': dash.ALL}, 'n_clicks'),
+    State('table-data-store', 'data'),
+    State('last-pred-features', 'data'),
+    prevent_initial_call=True
+)
+def show_shap_explanation(n_clicks_list, table_data, features_data):
+    if not n_clicks_list or not any(n_clicks_list):
+        return ''
+    # Find which button was clicked
+    idx = n_clicks_list.index(max(n_clicks_list))
+    if features_data is None or idx >= len(features_data):
+        return ''
+    # Get features for this row
+    row_features = [features_data[idx]]
+    try:
+        response = requests.post('http://localhost:5000/explain', json={'features': row_features})
+        if response.status_code == 200:
+            data = response.json()
+            shap_vals = data['shap_values'][0]
+            feature_names = data['feature_names']
+            pred = data['predictions'][0]
+            fig = go.Figure([
+                go.Bar(x=feature_names, y=shap_vals, marker_color='#3aafa9')
+            ])
+            fig.update_layout(
+                title=f'Feature Attribution for Prediction (Value: {pred:.4f})',
+                xaxis_title='Feature',
+                yaxis_title='SHAP Value',
+                plot_bgcolor='rgba(0,0,0,0)',
+                paper_bgcolor='rgba(0,0,0,0)',
+                font=dict(family='Nunito, Inter, Segoe UI, Arial, sans-serif', size=15),
+                margin=dict(l=40, r=40, t=60, b=40),
+                height=320,
+            )
+            return dcc.Graph(figure=fig)
+        else:
+            return dbc.Alert(f'API Error: {response.text}', color='danger')
+    except Exception as e:
+        return dbc.Alert(f'Error contacting API: {e}', color='danger')
 
 if __name__ == '__main__':
-    app.run_server(debug=True)
+    app.run(debug=True)
