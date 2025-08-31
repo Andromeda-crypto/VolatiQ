@@ -59,3 +59,26 @@
 2025-08-30 21:38:56,346 - __main__ - INFO - Loading model from model/saved_model/volatility_model.keras
 2025-08-30 21:38:56,460 - __main__ - INFO - Loading scaler from model/saved_model/scaler.save
 2025-08-30 21:38:56,460 - __main__ - INFO - Model and scaler loaded successfully
+2025-08-30 21:43:33,351 - __main__ - INFO - Loading model from model/saved_model/volatility_model.keras
+2025-08-30 21:43:33,497 - __main__ - INFO - Loading scaler from model/saved_model/scaler.save
+2025-08-30 21:43:33,498 - __main__ - INFO - Model and scaler loaded successfully
+2025-08-30 21:43:33,527 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5001
+2025-08-30 21:43:33,527 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-08-30 21:43:33,528 - werkzeug - INFO -  * Restarting with stat
+2025-08-30 21:43:40,173 - __main__ - INFO - Loading model from model/saved_model/volatility_model.keras
+2025-08-30 21:43:40,301 - __main__ - INFO - Loading scaler from model/saved_model/scaler.save
+2025-08-30 21:43:40,302 - __main__ - INFO - Model and scaler loaded successfully
+2025-08-30 21:43:40,326 - werkzeug - WARNING -  * Debugger is active!
+2025-08-30 21:43:40,347 - werkzeug - INFO -  * Debugger PIN: 882-771-795
+2025-08-30 21:46:06,294 - __main__ - INFO - Loading model from model/saved_model/volatility_model.keras
+2025-08-30 21:46:32,385 - api.app - INFO - Loading model from model/saved_model/volatility_model.keras
+2025-08-30 21:46:32,754 - api.app - INFO - Loading scaler from model/saved_model/scaler.save
+2025-08-30 21:46:41,696 - api.app - INFO - Model and scaler loaded successfully
+2025-08-30 21:46:41,716 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5001
+2025-08-30 21:46:41,716 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-08-30 21:46:45,065 - werkzeug - INFO - 127.0.0.1 - - [30/Aug/2025 21:46:45] "GET /health HTTP/1.1" 200 -
+2025-08-30 21:47:28,801 - werkzeug - INFO - 127.0.0.1 - - [30/Aug/2025 21:47:28] "GET /health HTTP/1.1" 200 -
+2025-08-30 21:50:04,782 - werkzeug - INFO - 127.0.0.1 - - [30/Aug/2025 21:50:04] "GET / HTTP/1.1" 200 -
+2025-08-30 21:50:05,698 - werkzeug - INFO - 127.0.0.1 - - [30/Aug/2025 21:50:05] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -

@@ -17,8 +17,8 @@ class Config:
     
     # API Configuration
     API_HOST: str = os.getenv('API_HOST', '127.0.0.1')
-    API_PORT: int = int(os.getenv('API_PORT', '5000'))
-    API_URL: str = os.getenv('API_URL', 'http://localhost:5000')
+    API_PORT: int = int(os.getenv('API_PORT', '5001'))
+    API_URL: str = os.getenv('API_URL', 'http://localhost:5001')
     
     # Dashboard Configuration
     DASH_HOST: str = os.getenv('DASH_HOST', '127.0.0.1')
