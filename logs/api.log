@@ -1,0 +1,55 @@
+2025-08-30 21:32:00,837 - api.app - INFO - Loading model from model/saved_model/volatility_model.keras
+2025-08-30 21:32:01,012 - api.app - INFO - Loading scaler from model/saved_model/scaler.save
+2025-08-30 21:32:01,013 - api.app - INFO - Model and scaler loaded successfully
+2025-08-30 21:32:38,822 - api.app - INFO - Loading model from model/saved_model/volatility_model.keras
+2025-08-30 21:32:38,976 - api.app - INFO - Loading scaler from model/saved_model/scaler.save
+2025-08-30 21:32:38,977 - api.app - INFO - Model and scaler loaded successfully
+2025-08-30 21:32:38,985 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5001
+2025-08-30 21:32:38,985 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-08-30 21:32:42,173 - werkzeug - INFO - 127.0.0.1 - - [30/Aug/2025 21:32:42] "GET /health HTTP/1.1" 200 -
+2025-08-30 21:32:42,176 - werkzeug - INFO - 127.0.0.1 - - [30/Aug/2025 21:32:42] "GET / HTTP/1.1" 200 -
+2025-08-30 21:33:05,342 - api.app - INFO - Loading model from model/saved_model/volatility_model.keras
+2025-08-30 21:33:05,502 - api.app - INFO - Loading scaler from model/saved_model/scaler.save
+2025-08-30 21:33:05,503 - api.app - INFO - Model and scaler loaded successfully
+2025-08-30 21:33:05,510 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5002
+2025-08-30 21:33:05,510 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-08-30 21:33:08,715 - api.app - INFO - Prediction successful: 2 predictions in 0.161s
+2025-08-30 21:33:08,716 - werkzeug - INFO - 127.0.0.1 - - [30/Aug/2025 21:33:08] "POST /predict HTTP/1.1" 200 -
+2025-08-30 21:34:25,511 - api.app - INFO - Loading model from model/saved_model/volatility_model.keras
+2025-08-30 21:34:25,655 - api.app - INFO - Loading scaler from model/saved_model/scaler.save
+2025-08-30 21:34:25,656 - api.app - INFO - Model and scaler loaded successfully
+2025-08-30 21:34:25,662 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5003
+2025-08-30 21:34:25,662 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-08-30 21:34:28,809 - werkzeug - INFO - 127.0.0.1 - - [30/Aug/2025 21:34:28] "GET /health HTTP/1.1" 200 -
+2025-08-30 21:34:28,826 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5004
+2025-08-30 21:34:28,826 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-08-30 21:34:31,896 - api.app - INFO - Prediction successful: 1 predictions in 0.060s
+2025-08-30 21:34:31,896 - werkzeug - INFO - 127.0.0.1 - - [30/Aug/2025 21:34:31] "POST /predict HTTP/1.1" 200 -
+2025-08-30 21:34:52,628 - api.app - INFO - Loading model from model/saved_model/volatility_model.keras
+2025-08-30 21:34:52,762 - api.app - INFO - Loading scaler from model/saved_model/scaler.save
+2025-08-30 21:34:52,763 - api.app - INFO - Model and scaler loaded successfully
+2025-08-30 21:34:52,767 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5003
+2025-08-30 21:34:52,767 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-08-30 21:34:55,910 - werkzeug - INFO - 127.0.0.1 - - [30/Aug/2025 21:34:55] "GET /health HTTP/1.1" 200 -
+2025-08-30 21:34:55,927 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5004
+2025-08-30 21:34:55,927 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-08-30 21:34:58,994 - api.app - INFO - Prediction successful: 1 predictions in 0.059s
+2025-08-30 21:34:58,995 - werkzeug - INFO - 127.0.0.1 - - [30/Aug/2025 21:34:58] "POST /predict HTTP/1.1" 200 -
+2025-08-30 21:35:44,180 - __main__ - INFO - Loading model from model/saved_model/volatility_model.keras
+2025-08-30 21:35:44,324 - __main__ - INFO - Loading scaler from model/saved_model/scaler.save
+2025-08-30 21:35:44,325 - __main__ - INFO - Model and scaler loaded successfully
+2025-08-30 21:35:44,355 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2025-08-30 21:35:44,355 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-08-30 21:35:44,357 - werkzeug - INFO -  * Restarting with stat
+2025-08-30 21:35:50,758 - __main__ - INFO - Loading model from model/saved_model/volatility_model.keras
+2025-08-30 21:35:50,868 - __main__ - INFO - Loading scaler from model/saved_model/scaler.save
+2025-08-30 21:35:50,869 - __main__ - INFO - Model and scaler loaded successfully
+2025-08-30 21:35:50,891 - werkzeug - WARNING -  * Debugger is active!
+2025-08-30 21:35:50,912 - werkzeug - INFO -  * Debugger PIN: 882-771-795
