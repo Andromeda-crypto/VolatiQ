@@ -6,6 +6,25 @@ import plotly.graph_objs as go
 import base64
 import io
 import requests
+import os
+import sys
+from datetime import datetime
+import logging
+
+# Add parent directory to path for config import
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from config import config
+
+# Configure logging
+logging.basicConfig(
+    level=getattr(logging, config.LOG_LEVEL.upper()),
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler('logs/dashboard.log'),
+        logging.StreamHandler()
+    ]
+)
+logger = logging.getLogger(__name__)
 
 # Dash will automatically load any CSS in the 'assets' folder in the same directory as this file.
 # Place custom styles in dashboard/assets/custom.css
@@ -152,10 +171,16 @@ def update_output(n_clicks, contents, horizon, features):
         return dbc.Alert(f'Missing features in uploaded data: {missing}', color='danger'), go.Figure(), '', None, None
     X = df[features].values.tolist()
     try:
-        response = requests.post('http://localhost:5000/predict', json={'features': X})
+        logger.info(f"Making prediction request with {len(X)} samples")
+        response = requests.post(f'{config.API_URL}/predict', json={'features': X}, timeout=30)
         if response.status_code == 200:
-            preds = response.json()['predictions']
+            result = response.json()
+            preds = result['predictions']
             df['Predicted Volatility'] = preds
+            
+            # Log prediction metrics
+            processing_time = result.get('processing_time_seconds', 'N/A')
+            logger.info(f"Prediction successful: {len(preds)} predictions in {processing_time}s")
             # Add Explain buttons
             explain_buttons = [
                 dbc.Button('Explain', id={'type': 'explain-btn', 'index': i}, color='info', size='sm', style={'margin': '0 4px'})
@@ -200,9 +225,21 @@ def update_output(n_clicks, contents, horizon, features):
                 X[:10]
             )
         else:
-            return dbc.Alert(f'API Error: {response.text}', color='danger'), go.Figure(), '', None, None
+            error_msg = f'API Error ({response.status_code}): {response.text}'
+            logger.error(error_msg)
+            return dbc.Alert(error_msg, color='danger'), go.Figure(), '', None, None
+    except requests.exceptions.Timeout:
+        error_msg = 'API request timeout - please try again'
+        logger.error(error_msg)
+        return dbc.Alert(error_msg, color='danger'), go.Figure(), '', None, None
+    except requests.exceptions.ConnectionError:
+        error_msg = f'Cannot connect to API at {config.API_URL}'
+        logger.error(error_msg)
+        return dbc.Alert(error_msg, color='danger'), go.Figure(), '', None, None
     except Exception as e:
-        return dbc.Alert(f'Error contacting API: {e}', color='danger'), go.Figure(), '', None, None
+        error_msg = f'Unexpected error: {str(e)}'
+        logger.error(error_msg)
+        return dbc.Alert(error_msg, color='danger'), go.Figure(), '', None, None
 
 @app.callback(
     Output('shap-explanation', 'children'),
@@ -221,7 +258,8 @@ def show_shap_explanation(n_clicks_list, table_data, features_data):
     # Get features for this row
     row_features = [features_data[idx]]
     try:
-        response = requests.post('http://localhost:5000/explain', json={'features': row_features})
+        logger.info(f"Making explanation request for row {idx}")
+        response = requests.post(f'{config.API_URL}/explain', json={'features': row_features}, timeout=60)
         if response.status_code == 200:
             data = response.json()
             shap_vals = data['shap_values'][0]
@@ -242,9 +280,29 @@ def show_shap_explanation(n_clicks_list, table_data, features_data):
             )
             return dcc.Graph(figure=fig)
         else:
-            return dbc.Alert(f'API Error: {response.text}', color='danger')
+            error_msg = f'API Error ({response.status_code}): {response.text}'
+            logger.error(error_msg)
+            return dbc.Alert(error_msg, color='danger')
+    except requests.exceptions.Timeout:
+        error_msg = 'API request timeout - please try again'
+        logger.error(error_msg)
+        return dbc.Alert(error_msg, color='danger')
+    except requests.exceptions.ConnectionError:
+        error_msg = f'Cannot connect to API at {config.API_URL}'
+        logger.error(error_msg)
+        return dbc.Alert(error_msg, color='danger')
     except Exception as e:
-        return dbc.Alert(f'Error contacting API: {e}', color='danger')
+        error_msg = f'Unexpected error: {str(e)}'
+        logger.error(error_msg)
+        return dbc.Alert(error_msg, color='danger')
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    # Ensure logs directory exists
+    os.makedirs('logs', exist_ok=True)
+    
+    # Run the dashboard
+    app.run(
+        host=config.DASH_HOST,
+        port=config.DASH_PORT,
+        debug=config.is_development
+    )
