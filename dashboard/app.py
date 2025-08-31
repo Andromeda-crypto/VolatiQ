@@ -236,6 +236,7 @@ def update_output(n_clicks, contents, horizon, features):
         error_msg = f'Cannot connect to API at {config.API_URL}'
         logger.error(error_msg)
         return dbc.Alert(error_msg, color='danger'), go.Figure(), '', None, None
+        
     except Exception as e:
         error_msg = f'Unexpected error: {str(e)}'
         logger.error(error_msg)
