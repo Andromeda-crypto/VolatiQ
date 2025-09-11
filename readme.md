@@ -69,46 +69,7 @@ pip install -r requirements.txt
 # Train model (if needed)
 python model/train.py
 
-# Start services
-python api/app.py        # Terminal 1 - API on :5000
-python dashboard/app.py  # Terminal 2 - Dashboard on :8050
-```
 
-## 📊 Usage Examples
-
-### REST API
-
-```python
-import requests
-
-# Make predictions
-response = requests.post('http://localhost:5000/predict', json={
-    'features': [
-        [0.001, 0.02, 150.5, 149.8, 65.2],  # [log_return, volatility, ma_5, ma_10, rsi]
-        [0.002, 0.018, 151.0, 150.1, 68.5]
-    ]
-})
-
-predictions = response.json()['predictions']
-print(f"Volatility predictions: {predictions}")
-
-# Get explanations
-response = requests.post('http://localhost:5000/explain', json={
-    'features': [[0.001, 0.02, 150.5, 149.8, 65.2]]
-})
-
-shap_values = response.json()['shap_values'][0]
-print(f"Feature importance: {shap_values}")
-```
-
-### Dashboard Interface
-
-1. **Navigate to** `http://localhost:8050`
-2. **Upload CSV** with financial features
-3. **Select prediction horizon** (1, 5, 10, or 21 days)
-4. **Choose features** for model input
-5. **Run predictions** and view interactive visualizations
-6. **Analyze explanations** with SHAP feature attribution
 
 ## 🛠️ Tech Stack
 
@@ -201,13 +162,6 @@ VolatiQ/
 - **Azure**: Container Instances or AKS support
 - **Heroku**: One-click deployment available
 
-### On-Premises
-- **Docker Swarm**: Multi-node orchestration
-- **Kubernetes**: Enterprise container orchestration
-- **Bare Metal**: Traditional server deployment
-
-See [DEPLOYMENT.md](DEPLOYMENT.md) for detailed deployment instructions.
-
 ## 📊 Model Information
 
 - **Architecture**: Deep Neural Network (128→64→32→1 neurons)
@@ -266,23 +220,8 @@ We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guid
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
-## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🏆 Resume Highlights
-
-This project demonstrates:
-
-- **Production-Grade Architecture**: Enterprise-ready design patterns
-- **DevOps Excellence**: Complete CI/CD pipeline with automated testing
-- **Modern Web Development**: RESTful APIs and interactive dashboards
-- **Machine Learning Engineering**: End-to-end ML pipeline deployment
-- **Cloud-Native Development**: Container-first architecture
-- **Security Best Practices**: Input validation and secure deployment
-- **Performance Optimization**: Efficient algorithms and caching strategies
-- **Comprehensive Testing**: Unit, integration, and performance tests
-- **Documentation Excellence**: Clear, comprehensive documentation
 
 
 *Built with ❤️ for the finance and ML community*
