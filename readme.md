@@ -7,7 +7,7 @@
 
 ## 🚀 Overview
 
-VolatiQ is a production-ready quantitative risk intelligence platform that forecasts short-term market volatility using advanced machine learning. Built with enterprise-grade architecture, it provides actionable insights for traders, risk managers, and financial analysts through a modern web interface and robust REST API.
+VolatiQ is a production-ready(not yet) quantitative risk intelligence platform that forecasts short-term market volatility using advanced machine learning. Built with enterprise-grade architecture, it provides actionable insights for traders, risk managers, and financial analysts through a modern web interface and robust REST API.
 
 ### ✨ Key Features
 
