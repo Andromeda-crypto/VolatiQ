@@ -1,6 +1,6 @@
 import tensorflow as tf
-from tensorflow.keras import layers, models
-
+from tensorflow import keras
+from keras import layers,models
 def build_advanced_model(input_shape):
     """
     Build an advanced DNN for volatility forecasting.
